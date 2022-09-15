@@ -2,7 +2,7 @@ from termcolor import colored
 
 from board import Board
 from helper import Helper
-from memory import Memory
+from timing import Timing
 
 
 class UI:
@@ -76,9 +76,9 @@ class UI:
 
     @staticmethod
     def print_intervals():
-        dashboard_update_interval = f'{Memory.dashboard_update_interval}s'
+        dashboard_update_interval = f'{Timing.dashboard_update_interval}s'
         dashboard_update_interval = colored(dashboard_update_interval, UI.YELLOW_COLOR)
-        data_file_update_interval = f'{Memory.data_file_update_interval}s'
+        data_file_update_interval = f'{Timing.data_file_update_interval}s'
         data_file_update_interval = colored(data_file_update_interval, UI.YELLOW_COLOR)
         print(f'Dashboard updates every {dashboard_update_interval}')
         print(f'Data file updates every {data_file_update_interval}')

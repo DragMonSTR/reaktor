@@ -1,7 +1,7 @@
 from helper import Helper
 
 
-class Memory:
+class Timing:
     dashboard_update_interval = 5
     data_file_update_interval = 15
 
@@ -10,20 +10,20 @@ class Memory:
 
     @staticmethod
     def set_last_dashboard_update_time(new_time):
-        Memory.last_dashboard_update_time = new_time
+        Timing.last_dashboard_update_time = new_time
 
     @staticmethod
     def set_data_file_update_time(new_time):
-        Memory.last_data_file_update_time = new_time
+        Timing.last_data_file_update_time = new_time
 
     @staticmethod
     def check_if_need_to_update_dashboard():
         current_time = Helper.get_current_time()
-        time_passed = current_time - Memory.last_dashboard_update_time
-        return time_passed > Memory.dashboard_update_interval
+        time_passed = current_time - Timing.last_dashboard_update_time
+        return time_passed > Timing.dashboard_update_interval
 
     @staticmethod
     def check_if_need_to_update_data_file():
         current_time = Helper.get_current_time()
-        time_passed = current_time - Memory.last_data_file_update_time
-        return time_passed > Memory.data_file_update_interval
+        time_passed = current_time - Timing.last_data_file_update_time
+        return time_passed > Timing.data_file_update_interval
