@@ -11,6 +11,8 @@ def execute_dashboard_loop_iteration():
         UIActivity.open_menu_activity()
         return
 
+    Sync.update_public_data_file()
+
     need_to_update_dashboard = Timing.check_if_need_to_update_dashboard()
     need_to_update_data_file = Timing.check_if_need_to_update_data_file()
 
@@ -20,7 +22,7 @@ def execute_dashboard_loop_iteration():
         Timing.set_last_dashboard_update_time(current_time)
         if need_to_update_data_file:
             Timing.set_last_data_file_update_time(current_time)
-            Sync.upload_measurements_to_file()
+            Sync.save_measurements_to_storage()
         UI.update()
 
 
