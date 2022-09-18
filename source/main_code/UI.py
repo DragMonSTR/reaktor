@@ -2,72 +2,129 @@ from termcolor import colored
 
 from board import Board
 from helper import Helper
-from memory import Memory
+from timing import Timing
+
+import time
+
+
+class UIActivity:
+    SCAN_BOARDS_ACTIVITY = 'scan boards'
+    MENU_ACTIVITY = 'menu'
+    INTERVALS_ACTIVITY = 'intervals'
+    DASHBOARD_ACTIVITY = 'dashboard'
+
+    current_activity = SCAN_BOARDS_ACTIVITY
+
+    @staticmethod
+    def get_current_activity():
+        return UIActivity.current_activity
+
+    @staticmethod
+    def open_scan_boards_activity():
+        UIActivity.current_activity = UIActivity.SCAN_BOARDS_ACTIVITY
+
+    @staticmethod
+    def open_menu_activity():
+        UIActivity.current_activity = UIActivity.MENU_ACTIVITY
+
+    @staticmethod
+    def open_intervals_activity():
+        UIActivity.current_activity = UIActivity.INTERVALS_ACTIVITY
+
+    @staticmethod
+    def open_dashboard_activity():
+        UIActivity.current_activity = UIActivity.DASHBOARD_ACTIVITY
 
 
 class UI:
-    OPTIONS = [
+    WARNING_COLOR = 'red'
+    SUCCESS_COLOR = 'green'
+    YELLOW_COLOR = 'yellow'
+    NAME_COLOR = 'cyan'
+    MENU_OPTIONS = [
         'Start',
         'Update boards list',
         'Connect a sensor',
         'Disconnect a sensor',
         'Rename a sensor',
-        'Change measurement interval',
+        'Intervals settings',
         'Exit program'
     ]
-    WARNING_COLOR = 'red'
-    SUCCESS_COLOR = 'green'
-    YELLOW_COLOR = 'yellow'
-    NAME_COLOR = 'cyan'
-    DEFAULT_COLOR = 'white'
-    dashboard_mode = False
+    INTERVALS_OPTIONS = [
+        'Dashboard update interval',
+        'File with data update interval',
+        'Exit'
+    ]
+
     last_message = ''
 
     @staticmethod
     def update():
         Helper.clear_console()
 
-        if not len(Board.boards_list):
-            UI.show_no_boards_error()
-            return
-
-        if UI.dashboard_mode:
-            UI.print_dashboard()
-            UI.print_intervals()
-            print(f'Press {colored("esc", UI.YELLOW_COLOR)} to stop')
-            return
-
-        UI.print_last_message()
-
-        UI.print_dividing_line()
-        UI.print_intervals()
-        UI.print_boards_configuration()
-        UI.print_dividing_line()
-        print()
-
-        UI.print_commands()
-        selected_option = UI.ask_for_option()
-        UI.process_selected_option(selected_option)
+        current_activity = UIActivity.get_current_activity()
+        if current_activity == UIActivity.SCAN_BOARDS_ACTIVITY:
+            UI.update_scan_boards_activity()
+        elif current_activity == UIActivity.MENU_ACTIVITY:
+            UI.update_menu_activity()
+        elif current_activity == UIActivity.INTERVALS_ACTIVITY:
+            UI.update_intervals_activity()
+        elif current_activity == UIActivity.DASHBOARD_ACTIVITY:
+            UI.update_dashboard_activity()
 
     @staticmethod
-    def show_no_boards_error():
-        if len(Board.boards_list) == 0:
-            print(colored('No connected boards found', UI.WARNING_COLOR))
-            print('Here is a solution for you:')
-            print('  1. Get any Arduino board')
-            print('  2. Upload our Arduino code on it')
-            print('  3. Connect your Arduino with USB to this computer\n')
+    def update_scan_boards_activity():
+        UI.scan_connected_boards()
+        if len(Board.boards_list):
+            UIActivity.open_menu_activity()
+            return
+
+        Helper.clear_console()
+        print(colored('No connected boards found', UI.WARNING_COLOR))
+        print('Here is a solution for you:')
+        print('  1. Get any Arduino board')
+        print('  2. Upload our Arduino code on it')
+        print('  3. Connect your Arduino with USB to this computer\n')
 
         ctrl_key_text = colored('ctrl', UI.YELLOW_COLOR)
         c_key_text = colored('c', UI.YELLOW_COLOR)
         enter_key_text = colored('enter', UI.YELLOW_COLOR)
-        print(f'Press {ctrl_key_text} + {c_key_text} to exit')
+        print(f'Press {ctrl_key_text} + {c_key_text} to exit program')
         print(f'Press {enter_key_text} to rescan connected boards')
         input()
 
     @staticmethod
+    def update_menu_activity():
+        UI.print_last_message()
+
+        UI.print_intervals()
+        UI.print_boards_configuration()
+        UI.print_dividing_line()
+
+        UI.print_menu_options()
+        selected_option = UI.ask_for_option()
+        UI.process_selected_menu_option(selected_option)
+
+    @staticmethod
+    def update_dashboard_activity():
+        UI.print_dashboard()
+        UI.print_intervals()
+        print(f'Press {colored("esc", UI.YELLOW_COLOR)} to stop')
+
+    @staticmethod
+    def update_intervals_activity():
+        UI.print_last_message()
+
+        UI.print_intervals()
+        UI.print_dividing_line()
+
+        UI.print_intervals_options()
+        selected_interval_option = UI.ask_for_option()
+        UI.process_intervals_option(selected_interval_option)
+
+    @staticmethod
     def print_dividing_line():
-        print('- - - - - - - - - - - - - - - - - - - - - - ')
+        print('- - - - - - - - - - - - - - - - - - - - - - \n')
 
     @staticmethod
     def print_last_message():
@@ -76,25 +133,16 @@ class UI:
 
     @staticmethod
     def print_intervals():
-        dashboard_update_interval = f'{Memory.dashboard_update_interval}s'
+        dashboard_update_interval = f'{Timing.dashboard_update_interval}s'
         dashboard_update_interval = colored(dashboard_update_interval, UI.YELLOW_COLOR)
-        data_file_update_interval = f'{Memory.data_file_update_interval}s'
+        data_file_update_interval = f'{Timing.data_file_update_interval}s'
         data_file_update_interval = colored(data_file_update_interval, UI.YELLOW_COLOR)
         print(f'Dashboard updates every {dashboard_update_interval}')
-        print(f'Data file updates every {data_file_update_interval}')
+        print(f'File with data updates every {data_file_update_interval}')
 
     @staticmethod
     def print_boards_configuration():
-        if len(Board.boards_list) == 0:
-            print('No connected boards found, here is a solution for you')
-            print('1. Get any Arduino board')
-            print('2. Upload our Arduino code on it')
-            print('3. Connect your Arduino with USB')
-            print('4. Use update command')
-            return
-
         print('Connected boards:')
-
         for board in Board.boards_list:
             UI.print_board_info(board)
             for pin_index, sensor in enumerate(board.sensors_list):
@@ -119,13 +167,9 @@ class UI:
         print(f'  {sensor_name}: {sensor_connection}')
 
     @staticmethod
-    def print_commands():
+    def print_menu_options():
         print('Here are available options:')
-        for i, option in enumerate(UI.OPTIONS):
-            option_index = colored(str(i + 1), UI.YELLOW_COLOR)
-            option_first_letter = colored(option[0], UI.YELLOW_COLOR)
-            option_name = option_first_letter + option[1:]
-            print(f'  {option_index} - {option_name}')
+        UI.print_options(UI.MENU_OPTIONS)
 
     @staticmethod
     def print_dashboard():
@@ -152,32 +196,18 @@ class UI:
         return f'| {sensor_name_formatted} | {sensor_value_formatted} |'
 
     @staticmethod
-    def set_last_message(message, message_color=None):
-        if message_color:
-            message = colored(message, message_color)
-        UI.last_message = message
-
-    @staticmethod
-    def enter_dashboard_mode():
-        UI.dashboard_mode = True
-
-    @staticmethod
-    def exit_dashboard_mode():
-        UI.dashboard_mode = False
-
-    @staticmethod
     def ask_for_option():
         return input('Select your option: ')
 
     @staticmethod
-    def process_selected_option(selected_option):
+    def process_selected_menu_option(selected_option):
         selected_option = selected_option.lower()
         # start
         if selected_option == '1' or selected_option == 's':
-            UI.enter_dashboard_mode()
+            UIActivity.open_dashboard_activity()
         # reload configuration
         elif selected_option == '2' or selected_option == 'u':
-            UI.scan_connected_boards()
+            UIActivity.open_scan_boards_activity()
         # connect sensor
         elif selected_option == '3' or selected_option == 'c':
             UI.connect_sensor()
@@ -187,6 +217,9 @@ class UI:
         # rename sensor
         elif selected_option == '5' or selected_option == 'r':
             UI.rename_sensor()
+        # intervals settings
+        elif selected_option == '6' or selected_option == 'i':
+            UIActivity.open_intervals_activity()
         # exit
         elif selected_option == '7' or selected_option == 'e':
             Helper.exit_program()
@@ -255,7 +288,7 @@ class UI:
 
         message = 'Enter new name for sensor "'
         message += colored(sensor_name_old, UI.NAME_COLOR)
-        message += colored('"', UI.DEFAULT_COLOR)
+        message += '"'
         sensor_name_new = input(message + '\n')
 
         if sensor_name_new == sensor_name_old:
@@ -283,3 +316,112 @@ class UI:
         Helper.clear_console()
         print('Scanning connected boards...')
         Board.update_boards_list()
+
+    @staticmethod
+    def print_intervals_options():
+        print('Here are available intervals to change:')
+        UI.print_options(UI.INTERVALS_OPTIONS)
+
+    @staticmethod
+    def process_intervals_option(selected_option):
+        selected_option = selected_option.lower()
+        # dashboard update interval
+        if selected_option == '1' or selected_option == 'd':
+            UI.change_dashboard_update_interval()
+        # file data update interval
+        elif selected_option == '2' or selected_option == 'f':
+            UI.change_data_file_update_interval()
+        # exit
+        elif selected_option == '3' or selected_option == 'e':
+            UIActivity.open_menu_activity()
+        else:
+            message = colored('There is no option "', UI.WARNING_COLOR)
+            message += colored(selected_option, UI.NAME_COLOR)
+            message += colored('"', UI.WARNING_COLOR)
+            UI.set_last_message(message)
+
+    @staticmethod
+    def change_dashboard_update_interval():
+        Helper.clear_console()
+        UI.print_last_message()
+        UI.print_intervals()
+        UI.print_dividing_line()
+
+        question_text = 'Enter new dashboard update interval in seconds: '
+        new_interval = UI.ask_for_interval(question_text)
+        if not new_interval:
+            return
+
+        min_interval = Timing.MIN_DASHBOARD_UPDATE_INTERVAL
+        max_interval = Timing.MAX_DASHBOARD_UPDATE_INTERVAL
+
+        if new_interval < min_interval:
+            message = colored(
+                'Minimum dashboard update interval is ', UI.WARNING_COLOR)
+            message += colored(min_interval, UI.YELLOW_COLOR)
+            UI.set_last_message(message)
+            return
+
+        if new_interval > max_interval:
+            message = colored(
+                'Maximum dashboard update interval is ', UI.WARNING_COLOR)
+            message += colored(max_interval, UI.YELLOW_COLOR)
+            UI.set_last_message(message)
+            return
+
+        Timing.set_dashboard_update_interval(new_interval)
+        UI.set_last_message('Intervals were updated', UI.SUCCESS_COLOR)
+
+    @staticmethod
+    def change_data_file_update_interval():
+        Helper.clear_console()
+        UI.print_last_message()
+        UI.print_intervals()
+        UI.print_dividing_line()
+
+        question_text = 'Enter new data file update interval in seconds: '
+        new_interval = UI.ask_for_interval(question_text)
+        if not new_interval:
+            return
+
+        min_interval = Timing.MIN_DATA_FILE_UPDATE_INTERVAL
+        max_interval = Timing.MAX_DATA_FILE_UPDATE_INTERVAL
+
+        if new_interval < min_interval:
+            message = colored(
+                'Minimum data file update interval is ', UI.WARNING_COLOR)
+            message += colored(min_interval, UI.YELLOW_COLOR)
+            UI.set_last_message(message)
+            return
+
+        if new_interval > max_interval:
+            message = colored(
+                'Maximum data file update interval is ', UI.WARNING_COLOR)
+            message += colored(max_interval, UI.YELLOW_COLOR)
+            UI.set_last_message(message)
+            return
+
+        Timing.set_data_file_update_interval(new_interval)
+        UI.set_last_message('Intervals were updated', UI.SUCCESS_COLOR)
+
+    @staticmethod
+    def ask_for_interval(question_test):
+        try:
+            return int(input(question_test))
+        except ValueError:
+            UI.set_last_message('Interval should be a number', UI.WARNING_COLOR)
+            return None
+
+    @staticmethod
+    def print_options(options):
+        for i, option in enumerate(options):
+            option_index = colored(str(i + 1), UI.YELLOW_COLOR)
+            option_first_letter = colored(option[0], UI.YELLOW_COLOR)
+            option_name = option_first_letter + option[1:]
+            print(f'  {option_index} - {option_name}')
+
+    @staticmethod
+    def set_last_message(message, message_color=None):
+        if message_color:
+            message = colored(message, message_color)
+        UI.last_message = message
