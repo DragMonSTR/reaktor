@@ -4,6 +4,9 @@ data/*
 # IDE
 .idea/
 
+# test scripts
+source/main_code/test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
