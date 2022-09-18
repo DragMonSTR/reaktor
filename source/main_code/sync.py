@@ -9,7 +9,7 @@ class Sync:
     @staticmethod
     def upload_measurements_to_file():
         Sync.upload_measurements_to_working_file()
-        Sync.copy_working_file_to_opened()
+        Sync.copy_working_file_to_public()
 
     @staticmethod
     def upload_measurements_to_working_file():
@@ -19,8 +19,8 @@ class Sync:
         Excel.save(constant.WORKING_FILE_PATH)
 
     @staticmethod
-    def copy_working_file_to_opened():
+    def copy_working_file_to_public():
         try:
-            shutil.copyfile(constant.WORKING_FILE_PATH, constant.OPENED_FILE_PATH)
+            shutil.copyfile(constant.WORKING_FILE_PATH, constant.PUBLIC_FILE_PATH)
         except:
             return
