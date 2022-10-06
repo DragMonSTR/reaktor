@@ -99,9 +99,6 @@ class Board:
         self.device_name = f'board-{board_index + 1}'
         self.port = serial.Serial(port_name, 9600, timeout=1)
         self.sensors_list = []
-        time.sleep(1)
-        print(self.read_line())
-        print(self.read_line())
         input_pins_number = int(self.read_line())
         self.generate_sensors_list(input_pins_number)
 
@@ -140,7 +137,6 @@ class Board:
         self.port.write(data.encode())
 
     def read_line(self):
-        return self.port.readline().decode('utf-8').strip('\n\r')
-        #while True:
-        #    if self.port.in_waiting:
-        #        return self.port.readline().decode('utf-8').strip('\n\r')
+        while True:
+            if self.port.in_waiting:
+                return self.port.readline().decode('utf-8').strip('\n\r')
