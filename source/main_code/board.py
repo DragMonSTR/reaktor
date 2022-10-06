@@ -33,15 +33,15 @@ class Board:
 
         # linux | raspberry
         print('Yeh, its linux')
-        ports = glob.glob('/dev/ttyU[A-Za-z]*')
+        ports = glob.glob('/dev/tty[A-Za-z]*')
         for board_index, port in enumerate(ports):
-            #try:
-            print(port)
-            Board.boards_list.append(Board(board_index, port))
-            print(f'port "{port}" with index "{board_index}" appended')
-            #except (OSError, serial.SerialException):
-            #    print('exception')
-            #    pass
+            try:
+                print(port)
+                Board.boards_list.append(Board(board_index, port))
+                print('passed')
+            except (OSError, serial.SerialException):
+                print('excepted')
+                pass
         time.sleep(5)
 
     @staticmethod
