@@ -1,6 +1,5 @@
 import os
 import glob
-import time
 import serial
 import serial.tools.list_ports
 
@@ -36,13 +35,11 @@ class Board:
         ports = glob.glob('/dev/tty[UA][A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
-                print(port)
+                s = serial.Serial(port)
+                s.close()
                 Board.boards_list.append(Board(board_index, port))
-                print('passed')
             except (OSError, serial.SerialException):
-                print('excepted')
                 pass
-        time.sleep(5)
 
     @staticmethod
     def connect_sensor(sensor_name):
