@@ -36,11 +36,7 @@ class Board:
         ports = glob.glob('/dev/ttyA[A-Za-z]*')
         for board_index, port in enumerate(ports):
             #try:
-            port = str(port)
-            port_parts = port.split('/')
-            port_name = port_parts[len(port_parts) - 1]
             print(port)
-            print(port_name)
             Board.boards_list.append(Board(board_index, port))
             print(f'port "{port}" with index "{board_index}" appended')
             #except (OSError, serial.SerialException):
@@ -101,11 +97,9 @@ class Board:
 
     def __init__(self, board_index, port_name):
         self.device_name = f'board-{board_index + 1}'
-        print('before opening')
         self.port = serial.Serial(port_name, 9600, timeout=1)
-        print('opened')
         self.sensors_list = []
-        time.sleep(0.3)
+        time.sleep(1)
         print(self.read_line())
         print(self.read_line())
         input_pins_number = int(self.read_line())
