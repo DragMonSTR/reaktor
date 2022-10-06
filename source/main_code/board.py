@@ -5,6 +5,7 @@ import serial
 import serial.tools.list_ports
 
 from sensor import Sensor
+from timing import Timing
 
 
 class Board:
@@ -137,6 +138,9 @@ class Board:
         self.port.write(data.encode())
 
     def read_line(self):
+        start_time = Timing.get_current_time()
         while True:
+            if Timing.get_current_time() - start_time > 2:
+                return None
             if self.port.in_waiting:
                 return self.port.readline().decode('utf-8').strip('\n\r')
