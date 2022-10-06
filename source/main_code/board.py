@@ -41,7 +41,7 @@ class Board:
                 port_name = port_parts[len(port_parts) - 1]
                 print(port)
                 print(port_name)
-                Board.boards_list.append(Board(board_index, port))
+                Board.boards_list.append(Board(board_index, 'dev/ttyACM0'))
                 print(f'port "{port}" with index "{board_index}" appended')
             except (OSError, serial.SerialException):
                 print('exception')
