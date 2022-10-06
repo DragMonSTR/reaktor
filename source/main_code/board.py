@@ -41,7 +41,7 @@ class Board:
             port_name = port_parts[len(port_parts) - 1]
             print(port)
             print(port_name)
-            Board.boards_list.append(Board(board_index, 'dev/ttyACM0'))
+            Board.boards_list.append(Board(board_index, port))
             print(f'port "{port}" with index "{board_index}" appended')
             #except (OSError, serial.SerialException):
             #    print('exception')
@@ -101,7 +101,9 @@ class Board:
 
     def __init__(self, board_index, port_name):
         self.device_name = f'board-{board_index + 1}'
+        print('before opening')
         self.port = serial.Serial(port_name, 9600, timeout=1)
+        print('opened')
         self.sensors_list = []
         input_pins_number = int(self.read_line())
         self.generate_sensors_list(input_pins_number)
