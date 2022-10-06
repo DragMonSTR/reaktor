@@ -32,6 +32,7 @@ class Board:
             return
 
         # linux | raspberry
+        print('Yeh, its linux')
         ports = glob.glob('/dev/ttyA[A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
@@ -46,6 +47,7 @@ class Board:
             except (OSError, serial.SerialException):
                 print('exception')
                 pass
+        time.sleep(5)
 
     @staticmethod
     def connect_sensor(sensor_name):
