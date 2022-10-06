@@ -36,11 +36,10 @@ class Board:
         ports = glob.glob('/dev/ttyA[A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
-                s = serial.Serial(port)
-                s.close()
-                print(port)
+                port = str(port)
                 port_parts = port.split('/')
                 port_name = port_parts[len(port_parts) - 1]
+                print(port)
                 print(port_name)
                 Board.boards_list.append(Board(board_index, port))
                 print(f'port "{port}" with index "{board_index}" appended')
