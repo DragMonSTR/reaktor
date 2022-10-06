@@ -33,6 +33,10 @@ class Board:
 
         # linux | raspberry
         ports = glob.glob('/dev/ttyA[A-Za-z*')
+        print('linux')
+        for port in ports:
+            print(port)
+        time.sleep(2)
         for board_index, port in enumerate(ports):
             try:
                 s = serial.Serial(port)
