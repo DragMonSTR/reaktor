@@ -42,6 +42,7 @@ class Board:
                 s = serial.Serial(port)
                 s.close()
                 Board.boards_list.append(Board(board_index, port))
+                print(f'port "{port}" with index "{board_index}" appended')
             except (OSError, serial.SerialException):
                 pass
 
