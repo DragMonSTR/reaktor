@@ -53,7 +53,3 @@ class Helper:
     @staticmethod
     def get_current_time_string():
         return datetime.now().strftime("%H:%M:%S")
-
-    @staticmethod
-    def get_current_time():
-        return time.time()

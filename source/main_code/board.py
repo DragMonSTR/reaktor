@@ -32,24 +32,13 @@ class Board:
 
         # linux | raspberry
         print('Yeh, its linux')
-        ports = glob.glob('/dev/ttyA[A-Za-z]*')
+        ports = glob.glob('/dev/tty[UA][A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
-<<<<<<< Updated upstream
                 s = serial.Serial(port)
                 s.close()
-                print(port)
-                port_parts = port.split('/')
-                port_name = port_parts[len(port_parts) - 1]
-                print(port_name)
-                Board.boards_list.append(Board(board_index, port))
-                print(f'port "{port}" with index "{board_index}" appended')
-            except (OSError, serial.SerialException):
-                print('exception')
-=======
                 Board.boards_list.append(Board(board_index, port))
             except (OSError, serial.SerialException):
->>>>>>> Stashed changes
                 pass
 
     @staticmethod
