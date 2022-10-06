@@ -35,17 +35,17 @@ class Board:
         print('Yeh, its linux')
         ports = glob.glob('/dev/ttyA[A-Za-z]*')
         for board_index, port in enumerate(ports):
-            try:
-                port = str(port)
-                port_parts = port.split('/')
-                port_name = port_parts[len(port_parts) - 1]
-                print(port)
-                print(port_name)
-                Board.boards_list.append(Board(board_index, 'dev/ttyACM0'))
-                print(f'port "{port}" with index "{board_index}" appended')
-            except (OSError, serial.SerialException):
-                print('exception')
-                pass
+            #try:
+            port = str(port)
+            port_parts = port.split('/')
+            port_name = port_parts[len(port_parts) - 1]
+            print(port)
+            print(port_name)
+            Board.boards_list.append(Board(board_index, 'dev/ttyACM0'))
+            print(f'port "{port}" with index "{board_index}" appended')
+            #except (OSError, serial.SerialException):
+            #    print('exception')
+            #    pass
         time.sleep(5)
 
     @staticmethod
