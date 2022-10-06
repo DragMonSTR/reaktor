@@ -1,6 +1,5 @@
 import os
 import glob
-import time
 import serial
 import serial.tools.list_ports
 
@@ -36,6 +35,7 @@ class Board:
         ports = glob.glob('/dev/ttyA[A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
+<<<<<<< Updated upstream
                 s = serial.Serial(port)
                 s.close()
                 print(port)
@@ -46,8 +46,11 @@ class Board:
                 print(f'port "{port}" with index "{board_index}" appended')
             except (OSError, serial.SerialException):
                 print('exception')
+=======
+                Board.boards_list.append(Board(board_index, port))
+            except (OSError, serial.SerialException):
+>>>>>>> Stashed changes
                 pass
-        time.sleep(5)
 
     @staticmethod
     def connect_sensor(sensor_name):
