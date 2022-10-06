@@ -27,21 +27,35 @@ class Timing:
             Timing.set_dashboard_update_interval(new_interval)
 
     @staticmethod
-    def set_last_dashboard_update_time(new_time):
-        Timing.last_dashboard_update_time = new_time
+    def make_dashboard_updated():
+        interval = Timing.dashboard_update_interval
+        current_time = Timing.get_current_time()
+
+        if Timing.last_dashboard_update_time + 2 * interval > current_time:
+            Timing.last_dashboard_update_time += interval
+        else:
+            Timing.last_dashboard_update_time = current_time
 
     @staticmethod
-    def set_last_data_file_update_time(new_time):
-        Timing.last_data_file_update_time = new_time
+    def make_data_file_updated():
+        interval = Timing.data_file_update_interval
+        current_time = Timing.get_current_time()
+
+        if Timing.last_data_file_update_time + 2 * interval > current_time:
+            Timing.last_data_file_update_time += interval
+        else:
+            Timing.last_data_file_update_time = current_time
 
     @staticmethod
     def check_if_need_to_update_dashboard():
-        current_time = Helper.get_current_time()
-        time_passed = current_time - Timing.last_dashboard_update_time
+        time_passed = Timing.get_current_time() - Timing.last_dashboard_update_time
         return time_passed > Timing.dashboard_update_interval
 
     @staticmethod
     def check_if_need_to_update_data_file():
-        current_time = Helper.get_current_time()
-        time_passed = current_time - Timing.last_data_file_update_time
+        time_passed = Timing.get_current_time() - Timing.last_data_file_update_time
         return time_passed > Timing.data_file_update_interval
+
+    @staticmethod
+    def get_current_time():
+        return time.time()
