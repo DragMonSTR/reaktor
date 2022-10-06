@@ -143,6 +143,7 @@ class Board:
         self.port.write(data.encode())
 
     def read_line(self):
+        return self.port.readline().decode('utf-8').strip('\n\r')
         while True:
             if self.port.in_waiting:
                 return self.port.readline().decode('utf-8').strip('\n\r')
