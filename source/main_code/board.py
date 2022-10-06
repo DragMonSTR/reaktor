@@ -32,7 +32,7 @@ class Board:
             return
 
         # linux | raspberry
-        ports = glob.glob('/dev/ttyA[A-Za-z*')
+        ports = glob.glob('/dev/ttyA[A-Za-z]*')
         print('linux')
         for port in ports:
             print(port)
