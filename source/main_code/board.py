@@ -33,7 +33,7 @@ class Board:
 
         # linux | raspberry
         print('Yeh, its linux')
-        ports = glob.glob('/dev/ttyA[A-Za-z]*')
+        ports = glob.glob('/dev/ttyU[A-Za-z]*')
         for board_index, port in enumerate(ports):
             #try:
             print(port)
