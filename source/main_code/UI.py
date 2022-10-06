@@ -53,7 +53,7 @@ class UI:
     INTERVALS_OPTIONS = [
         'Dashboard update interval',
         'File with data update interval',
-        'Exit'
+        'Back'
     ]
 
     last_message = ''
@@ -331,8 +331,8 @@ class UI:
         # file data update interval
         elif selected_option == '2' or selected_option == 'f':
             UI.change_data_file_update_interval()
-        # exit
-        elif selected_option == '3' or selected_option == 'e':
+        # back
+        elif selected_option == '3' or selected_option == 'b':
             UIActivity.open_menu_activity()
         else:
             message = colored('There is no option "', UI.WARNING_COLOR)
