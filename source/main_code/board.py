@@ -3,6 +3,7 @@ import glob
 import serial
 import serial.tools.list_ports
 
+import constant
 from sensor import Sensor
 
 
@@ -41,6 +42,36 @@ class Board:
                 pass
 
     @staticmethod
+    def use_settings_backup():
+        with open(constant.SETTINGS_FILE_PATH) as settings_file:
+            lines = settings_file.readlines()
+        settings_file.close()
+
+        backup_info = []
+        for line in lines:
+            sensor_name = line.split(';')[0]
+            connected_status = bool(int(line.split(';')[1]))
+            backup_info.append({
+                'sensor_name': sensor_name,
+                'connected_status': connected_status
+            })
+
+        all_sensors = Board.get_all_sensors()
+        if len(backup_info) != len(all_sensors):
+            return
+
+        for i, sensor in enumerate(all_sensors):
+            sensor_name = backup_info[i]['sensor_name']
+            connected_status = backup_info[i]['connected_status']
+            sensor.rename(sensor_name)
+            if connected_status:
+                sensor.connect()
+
+    @staticmethod
+    def update_settings_backup():
+
+
+    @staticmethod
     def connect_sensor(sensor_name):
         sensor = Board.find_sensor_by_name(sensor_name)
         if sensor and not sensor.connected_status:
@@ -75,6 +106,13 @@ class Board:
         sensors_list = []
         for board in Board.boards_list:
             sensors_list += board.get_connected_sensors()
+        return sensors_list
+
+    @staticmethod
+    def get_all_sensors():
+        sensors_list = []
+        for board in Board.boards_list:
+            sensors_list += board.sensors_list
         return sensors_list
 
     @staticmethod
