@@ -31,7 +31,6 @@ class Board:
             return
 
         # linux | raspberry
-        print('Yeh, its linux')
         ports = glob.glob('/dev/tty[UA][A-Za-z]*')
         for board_index, port in enumerate(ports):
             try:
