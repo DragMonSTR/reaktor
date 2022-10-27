@@ -316,8 +316,6 @@ class UI:
         Helper.clear_console()
         print('Scanning connected boards...')
         Board.update_boards_list()
-        Board.use_settings_backup()
-        time.sleep(20)
 
     @staticmethod
     def print_intervals_options():
