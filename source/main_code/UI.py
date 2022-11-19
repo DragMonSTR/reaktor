@@ -175,20 +175,20 @@ class UI:
     def print_dashboard():
         sensors_list = Board.get_all_connected_sensors()
 
-        print('+--------------------------+-----------+')
-        print('|          sensor          |   value   |')
-        print('+--------------------------+-----------+')
+        print('+------------------------------------------+-----------+')
+        print('|                sensor name               |   value   |')
+        print('+------------------------------------------+-----------+')
         for sensor in sensors_list:
             table_row = UI.get_dashboard_row_by_sensor(sensor)
             print(table_row)
-        print('+--------------------------+-----------+')
+        print('+------------------------------------------+-----------+')
 
     @staticmethod
     def get_dashboard_row_by_sensor(sensor):
         sensor_name_formatted = sensor.get_name()
-        if len(sensor_name_formatted) > 24:
-            sensor_name_formatted = sensor_name_formatted[:21] + '...'
-        sensor_name_formatted += ' ' * (24 - len(sensor_name_formatted))
+        if len(sensor_name_formatted) > 40:
+            sensor_name_formatted = sensor_name_formatted[:37] + '...'
+        sensor_name_formatted += ' ' * (40 - len(sensor_name_formatted))
 
         sensor_value_formatted = str(round(sensor.get_value(), 3))
         sensor_value_formatted += ' ' * (9 - len(sensor_value_formatted))
