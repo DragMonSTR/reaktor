@@ -53,8 +53,7 @@ class Sync:
             query = f"name='data.xlsx'"
             response = service.files().list(q=query).execute()
             for file in response['files']:
-                print(file['id'])
-            time.sleep(5)
+                service.files().delete(fileId=file['id']).execute()
 
             query = f"name='{constant.CLOUD_DATA_DIR}' and mimeType='{cloud_folder_mime_type}'"
             response = service.files().list(q=query, spaces='drive').execute()
