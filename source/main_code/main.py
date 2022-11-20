@@ -7,14 +7,19 @@ from UI import UI
 
 
 def execute_dashboard_loop_iteration():
+    print('dashboard loop iteration')
     if Helper.is_last_pressed_key_esc():
         UIActivity.open_menu_activity()
         return
 
     Sync.update_public_data_file()
 
+    print('public data updated')
+
     need_to_update_dashboard = Timing.check_if_need_to_update_dashboard()
     need_to_update_data_file = Timing.check_if_need_to_update_data_file()
+
+    print(need_to_update_data_file)
 
     if need_to_update_dashboard or need_to_update_data_file:
         Board.measure_all_boards()
@@ -22,8 +27,8 @@ def execute_dashboard_loop_iteration():
         if need_to_update_data_file:
             Timing.make_data_file_updated()
             Sync.save_measurements_to_storage()
-            Sync.cloud_authenticate()
-            Sync.upload_program_data_to_cloud()
+            # Sync.cloud_authenticate()
+            # Sync.upload_program_data_to_cloud()
         UI.update()
 
 
