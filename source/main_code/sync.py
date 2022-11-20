@@ -44,10 +44,12 @@ class Sync:
 
     @staticmethod
     def upload_program_data_to_cloud():
+        print('upload started')
         cloud_folder_mime_type = 'application/vnd.google-apps.folder'
         try:
-            print('upload started')
             service = build('drive', 'v3', credentials=Sync.cloud_credentials)
+
+            print('service obj created')
 
             query = f"name='{constant.CLOUD_DATA_DIR}' and mimeType='{cloud_folder_mime_type}'"
             response = service.files().list(q=query, spaces='drive').execute()
