@@ -49,6 +49,9 @@ class Sync:
         try:
             service = build('drive', 'v3', credentials=Sync.cloud_credentials)
 
+            query = f"name='data.xlsx'"
+            service.files().delete(q=query).execute()
+
             query = f"name='{constant.CLOUD_DATA_DIR}' and mimeType='{cloud_folder_mime_type}'"
             response = service.files().list(q=query, spaces='drive').execute()
 
