@@ -14,12 +14,8 @@ def execute_dashboard_loop_iteration():
 
     Sync.update_public_data_file()
 
-    print('public data updated')
-
     need_to_update_dashboard = Timing.check_if_need_to_update_dashboard()
     need_to_update_data_file = Timing.check_if_need_to_update_data_file()
-
-    print(need_to_update_data_file)
 
     if need_to_update_dashboard or need_to_update_data_file:
         Board.measure_all_boards()
