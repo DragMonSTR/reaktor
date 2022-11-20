@@ -18,6 +18,7 @@ class Sync:
 
     @staticmethod
     def cloud_authenticate():
+        print('auth started')
         try:
             scopes = ['https://www.googleapis.com/auth/drive']
 
@@ -37,6 +38,7 @@ class Sync:
 
                 with open(constant.CLOUD_TOKEN_PATH, 'w') as token:
                     token.write(Sync.cloud_credentials.to_json())
+            print('auth ended')
         except Exception as _ex:
             print(f'Error: {_ex}')
 
@@ -44,10 +46,13 @@ class Sync:
     def upload_program_data_to_cloud():
         cloud_folder_mime_type = 'application/vnd.google-apps.folder'
         try:
+            print('upload started')
             service = build('drive', 'v3', credentials=Sync.cloud_credentials)
 
             query = f"name='{constant.CLOUD_DATA_DIR}' and mimeType='{cloud_folder_mime_type}'"
             response = service.files().list(q=query, spaces='drive').execute()
+
+            print('got response')
 
             if not response['files']:
                 folder_metadata = {
@@ -69,6 +74,7 @@ class Sync:
                                        media_body=media,
                                        fields='id').execute()
                 print(f'Backed up file {file_name}')
+            print('upload ended')
         except HttpError as e:
             print(f'Error: {e}')
 
