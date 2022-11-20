@@ -18,27 +18,30 @@ class Sync:
 
     @staticmethod
     def cloud_authenticate():
-        scopes = ['https://www.googleapis.com/auth/drive']
+        try:
+            scopes = ['https://www.googleapis.com/auth/drive']
 
-        if os.path.exists(constant.CLOUD_TOKEN_PATH):
-            Sync.cloud_credentials =\
-                Credentials.from_authorized_user_file(constant.CLOUD_TOKEN_PATH, scopes)
+            if os.path.exists(constant.CLOUD_TOKEN_PATH):
+                Sync.cloud_credentials =\
+                    Credentials.from_authorized_user_file(constant.CLOUD_TOKEN_PATH, scopes)
 
-        if not Sync.cloud_credentials or not Sync.cloud_credentials.valid:
-            if Sync.cloud_credentials and\
-                    Sync.cloud_credentials.expired and\
-                    Sync.cloud_credentials.refresh_token:
-                Sync.cloud_credentials.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    constant.CLOUD_CREDENTIALS_PATH, scopes)
-                Sync.cloud_credentials = flow.run_local_server(port=0)
+            if not Sync.cloud_credentials or not Sync.cloud_credentials.valid:
+                if Sync.cloud_credentials and\
+                        Sync.cloud_credentials.expired and\
+                        Sync.cloud_credentials.refresh_token:
+                    Sync.cloud_credentials.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        constant.CLOUD_CREDENTIALS_PATH, scopes)
+                    Sync.cloud_credentials = flow.run_local_server(port=0)
 
-            with open(constant.CLOUD_TOKEN_PATH, 'w') as token:
-                token.write(Sync.cloud_credentials.to_json())
+                with open(constant.CLOUD_TOKEN_PATH, 'w') as token:
+                    token.write(Sync.cloud_credentials.to_json())
+        except Exception as _ex:
+            print(f'Error: {_ex}')
 
     @staticmethod
-    def upload_files_in_dir_to_cloud(dir_path):
+    def upload_program_data_to_cloud():
         cloud_folder_mime_type = 'application/vnd.google-apps.folder'
         try:
             service = build('drive', 'v3', credentials=Sync.cloud_credentials)
@@ -56,12 +59,12 @@ class Sync:
             else:
                 folder_id = response['files'][0]['id']
 
-            for file_name in os.listdir(dir_path):
+            for file_name in os.listdir(constant.PROGRAM_DATA_DIR):
                 folder_metadata = {
                     'name': file_name,
                     'parents': [folder_id]
                 }
-                media = MediaFileUpload(f'{dir_path}/{file_name}')
+                media = MediaFileUpload(f'{constant.PROGRAM_DATA_DIR}/{file_name}')
                 service.files().create(body=folder_metadata,
                                        media_body=media,
                                        fields='id').execute()
