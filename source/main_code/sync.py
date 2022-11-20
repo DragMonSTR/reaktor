@@ -49,12 +49,8 @@ class Sync:
         try:
             service = build('drive', 'v3', credentials=Sync.cloud_credentials)
 
-            print('service obj created')
-
             query = f"name='{constant.CLOUD_DATA_DIR}' and mimeType='{cloud_folder_mime_type}'"
             response = service.files().list(q=query, spaces='drive').execute()
-
-            print('got response')
 
             if not response['files']:
                 folder_metadata = {

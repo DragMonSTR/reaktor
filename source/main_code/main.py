@@ -7,7 +7,6 @@ from UI import UI
 
 
 def execute_dashboard_loop_iteration():
-    print('dashboard loop iteration')
     if Helper.is_last_pressed_key_esc():
         UIActivity.open_menu_activity()
         return
