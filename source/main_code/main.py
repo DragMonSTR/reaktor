@@ -18,11 +18,11 @@ def execute_dashboard_loop_iteration():
 
     if need_to_update_dashboard or need_to_update_data_file:
         Board.measure_all_boards()
-        current_time = Helper.get_current_time()
-        Timing.set_last_dashboard_update_time(current_time)
+        Timing.make_dashboard_updated()
         if need_to_update_data_file:
-            Timing.set_last_data_file_update_time(current_time)
+            Timing.make_data_file_updated()
             Sync.save_measurements_to_storage()
+            # Sync.upload_storage_data_to_drive()
         UI.update()
 
 

@@ -53,7 +53,7 @@ class UI:
     INTERVALS_OPTIONS = [
         'Dashboard update interval',
         'File with data update interval',
-        'Exit'
+        'Back'
     ]
 
     last_message = ''
@@ -175,20 +175,20 @@ class UI:
     def print_dashboard():
         sensors_list = Board.get_all_connected_sensors()
 
-        print('+--------------------------+-----------+')
-        print('|          sensor          |   value   |')
-        print('+--------------------------+-----------+')
+        print('+------------------------------------------+-----------+')
+        print('|                sensor name               |   value   |')
+        print('+------------------------------------------+-----------+')
         for sensor in sensors_list:
             table_row = UI.get_dashboard_row_by_sensor(sensor)
             print(table_row)
-        print('+--------------------------+-----------+')
+        print('+------------------------------------------+-----------+')
 
     @staticmethod
     def get_dashboard_row_by_sensor(sensor):
         sensor_name_formatted = sensor.get_name()
-        if len(sensor_name_formatted) > 24:
-            sensor_name_formatted = sensor_name_formatted[:21] + '...'
-        sensor_name_formatted += ' ' * (24 - len(sensor_name_formatted))
+        if len(sensor_name_formatted) > 40:
+            sensor_name_formatted = sensor_name_formatted[:37] + '...'
+        sensor_name_formatted += ' ' * (40 - len(sensor_name_formatted))
 
         sensor_value_formatted = str(round(sensor.get_value(), 3))
         sensor_value_formatted += ' ' * (9 - len(sensor_value_formatted))
@@ -331,8 +331,8 @@ class UI:
         # file data update interval
         elif selected_option == '2' or selected_option == 'f':
             UI.change_data_file_update_interval()
-        # exit
-        elif selected_option == '3' or selected_option == 'e':
+        # back
+        elif selected_option == '3' or selected_option == 'b':
             UIActivity.open_menu_activity()
         else:
             message = colored('There is no option "', UI.WARNING_COLOR)

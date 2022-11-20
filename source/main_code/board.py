@@ -1,6 +1,7 @@
+import os
+import glob
 import serial
 import serial.tools.list_ports
-import time
 
 from sensor import Sensor
 
@@ -21,8 +22,23 @@ class Board:
         for board in Board.boards_list:
             board.port.close()
         Board.boards_list = []
-        for board_index, port in enumerate(serial.tools.list_ports.comports()):
-            Board.boards_list.append(Board(board_index, port.name))
+
+        # windows
+        if str(os.name).lower() == 'nt':
+            ports = serial.tools.list_ports.comports()
+            for board_index, port in enumerate(ports):
+                Board.boards_list.append(Board(board_index, port.name))
+            return
+
+        # linux | raspberry
+        ports = glob.glob('/dev/tty[UA][A-Za-z]*')
+        for board_index, port in enumerate(ports):
+            try:
+                s = serial.Serial(port)
+                s.close()
+                Board.boards_list.append(Board(board_index, port))
+            except (OSError, serial.SerialException):
+                pass
 
     @staticmethod
     def connect_sensor(sensor_name):
