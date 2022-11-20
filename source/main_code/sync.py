@@ -19,7 +19,6 @@ class Sync:
 
     @staticmethod
     def cloud_authenticate():
-        print('auth started')
         try:
             scopes = ['https://www.googleapis.com/auth/drive']
 
@@ -39,7 +38,6 @@ class Sync:
 
                 with open(constant.CLOUD_TOKEN_PATH, 'w') as token:
                     token.write(Sync.cloud_credentials.to_json())
-            print('auth ended')
         except Exception as _ex:
             print(f'Error: {_ex}')
 

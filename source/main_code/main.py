@@ -22,9 +22,11 @@ def execute_dashboard_loop_iteration():
         if need_to_update_data_file:
             Timing.make_data_file_updated()
             Sync.save_measurements_to_storage()
-            Sync.cloud_authenticate()
-            print('authenticated')
-            Sync.upload_program_data_to_cloud()
+            try:
+                Sync.cloud_authenticate()
+                Sync.upload_program_data_to_cloud()
+            except:
+                pass
         UI.update()
 
 
