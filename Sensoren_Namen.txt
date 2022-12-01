@@ -1,0 +1,10 @@
+Fermenter Pumpenseitig
+Fermenter Wärmeübertragerseitig
+Wärmetauscher Substrat Pumpenseitig
+Wärmetauscher Substrat Fermenterseitig
+Inokulum Reaktor
+Fermenter Innen
+Umgebung
+Boiler Heizwasser
+Vorlauf Wärmetauscher Heizkreislauf
+Sensor 10
