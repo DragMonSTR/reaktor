@@ -8,8 +8,10 @@ data/*
 .idea/
 
 # test scripts
+apps/test
 apps/arduino/test
 apps/monitor/test.py
+apps/configure/test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
