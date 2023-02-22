@@ -1,5 +1,5 @@
 # tokens
-source/main_code/cloud/token.json
+apps/monitoring/cloud/token.json
 
 # data measurement files
 data/*
@@ -8,7 +8,8 @@ data/*
 .idea/
 
 # test scripts
-source/main_code/test.py
+apps/arduino/test
+apps/monitoring/test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -162,4 +163,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-source/main_code/test.py
+apps/monitoring/test.py
