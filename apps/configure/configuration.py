@@ -3,8 +3,8 @@ from sensor import Sensor
 from board import Board
 
 class Configuration:
-    dashboard_update_interval = 5
-    data_file_update_interval = 15
+    dashboard_update_interval = 15
+    data_file_update_interval = 900
     boards = []
 
     @staticmethod
