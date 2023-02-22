@@ -23,7 +23,7 @@ class Configuration:
                 board = Board(board_name, sensors_number)
                 line_index += 1
                 for i in range(0, sensors_number):
-                    line = file_lines[line_index + i]
+                    line = file_lines[line_index + i].strip()
                     sensor_name = line.split(':')[0]
                     sensor_connected_status = False
                     if line.split(':')[1] == 'connected':
