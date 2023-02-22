@@ -1,3 +1,5 @@
+import os
+
 from constants import Constants
 from sensor import Sensor
 from board import Board
@@ -39,6 +41,10 @@ class Configuration:
 
     @staticmethod
     def write_configuration_to_file():
+        data_dir_path = os.path.dirname(Constants.CONFIGURATION_FILE_PATH)
+        if not os.path.exists(data_dir_path):
+            os.makedirs(data_dir_path)
+
         file = open(Constants.CONFIGURATION_FILE_PATH, 'w')
 
         file.write(str(Configuration.dashboard_update_interval))
