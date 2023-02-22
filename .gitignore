@@ -1,3 +1,6 @@
+# tokens
+source/main_code/cloud/token.json
+
 # data measurement files
 data/*
 
