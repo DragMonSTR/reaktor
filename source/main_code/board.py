@@ -1,5 +1,7 @@
 import os
 import glob
+import time
+
 import serial
 import serial.tools.list_ports
 
@@ -19,26 +21,34 @@ class Board:
 
     @staticmethod
     def update_boards_list():
+        Board.disconnect_boards()
+        is_windows = str(os.name).lower() == 'nt'
+
+        if is_windows:
+            ports = serial.tools.list_ports.comports()
+        else:
+            ports = glob.glob('/dev/tty[UA][A-Za-z]*')
+
+        board_index = 0
+        for port in ports:
+            try:
+                if is_windows:
+                    port_name = port.name
+                else:
+                    port_name = port
+
+                s = serial.Serial(port_name)
+                s.close()
+                Board.boards_list.append(Board(board_index, port_name))
+                board_index += 1
+            except (OSError, serial.SerialException):
+                pass
+
+    @staticmethod
+    def disconnect_boards():
         for board in Board.boards_list:
             board.port.close()
         Board.boards_list = []
-
-        # windows
-        if str(os.name).lower() == 'nt':
-            ports = serial.tools.list_ports.comports()
-            for board_index, port in enumerate(ports):
-                Board.boards_list.append(Board(board_index, port.name))
-            return
-
-        # linux | raspberry
-        ports = glob.glob('/dev/tty[UA][A-Za-z]*')
-        for board_index, port in enumerate(ports):
-            try:
-                s = serial.Serial(port)
-                s.close()
-                Board.boards_list.append(Board(board_index, port))
-            except (OSError, serial.SerialException):
-                pass
 
     @staticmethod
     def connect_sensor(sensor_name):
@@ -92,6 +102,8 @@ class Board:
         return 100 / 385 * sensor_resistance - 100000 / 385
 
     def __init__(self, board_index, port_name):
+        print(board_index, port_name)
+        time.sleep(3)
         self.device_name = f'board-{board_index + 1}'
         self.port = serial.Serial(port_name, 9600, timeout=1)
         self.sensors_list = []
