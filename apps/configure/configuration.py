@@ -1,14 +1,15 @@
+from constants import Constants
+
 class Configuration:
     dashboard_update_interval = 5
     data_file_update_interval = 15
     sensor_names = []
     sensor_connected_statuses = []
-    FILE_PATH = '../../data/configuration.txt'
 
     @staticmethod
     def read_configuration_from_file():
         try:
-            file = open(Configuration.FILE_PATH, 'r')
+            file = open(Constants.CONFIGURATION_FILE_PATH, 'r')
             file_lines = file.readlines()
             Configuration.dashboard_update_interval = int(file_lines[0].split(' ')[0])
             Configuration.data_file_update_interval = int(file_lines[1].split(' ')[0])
@@ -20,7 +21,7 @@ class Configuration:
 
     @staticmethod
     def write_configuration_to_file():
-        file = open(Configuration.FILE_PATH, 'w')
+        file = open(Constants.CONFIGURATION_FILE_PATH, 'w')
 
         file.write(str(Configuration.dashboard_update_interval))
         file.write(' - dashboard update interval\n')

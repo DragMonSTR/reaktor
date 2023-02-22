@@ -4,8 +4,8 @@ import os
 import sys
 
 from board import Board
-from timing import Timing
 from activity import Activity
+from constants import Constants
 from configuration import Configuration
 
 
@@ -309,8 +309,8 @@ class UI:
         UI.print_intervals()
         UI.print_dividing_line()
 
-        min_interval = Timing.MIN_DASHBOARD_UPDATE_INTERVAL
-        max_interval = Timing.MAX_DASHBOARD_UPDATE_INTERVAL
+        min_interval = Constants.MIN_DASHBOARD_UPDATE_INTERVAL
+        max_interval = Constants.MAX_DASHBOARD_UPDATE_INTERVAL
 
         try:
             interval = int(input('Enter new dashboard update interval in seconds: '))
@@ -330,8 +330,8 @@ class UI:
         UI.print_intervals()
         UI.print_dividing_line()
 
-        min_interval = Timing.MIN_DATA_FILE_UPDATE_INTERVAL
-        max_interval = Timing.MAX_DATA_FILE_UPDATE_INTERVAL
+        min_interval = Constants.MIN_DATA_FILE_UPDATE_INTERVAL
+        max_interval = Constants.MAX_DATA_FILE_UPDATE_INTERVAL
 
         try:
             interval = int(input('Enter new data file update interval in seconds: '))
