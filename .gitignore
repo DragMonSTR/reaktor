@@ -2,7 +2,7 @@
 apps/monitor/cloud/token.json
 
 # data measurement files
-data/configuration.txt
+data/
 
 # IDE
 .idea/
