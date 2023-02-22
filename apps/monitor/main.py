@@ -1,5 +1,6 @@
 from configuration import Configuration
 from timing import Timing
+from helper import Helper
 from board import Board
 from sync import Sync
 from UI import UI
@@ -26,12 +27,33 @@ def execute_dashboard_loop_iteration():
 
 
 def main():
+    try_to_create_boards()
+
     Sync.cloud_authenticate()
-    Configuration.read_configuration_from_file()
-    Board.update_boards_list(Configuration.boards)
 
     while True:
         execute_dashboard_loop_iteration()
+
+def try_to_create_boards():
+    while True:
+        try:
+            Helper.clear_console()
+            Configuration.read_configuration_from_file()
+            Board.update_boards_list(Configuration.boards)
+            if len(Board.get_all_connected_sensors()) == 0:
+                raise UserWarning
+            break
+        except (FileNotFoundError, ValueError, IndexError):
+            Configuration.reset()
+            UI.print_error('Settings configuration is damaged or was not created yet')
+            UI.print_configuration_guide()
+            input()
+        except UserWarning:
+            Board.disconnect_boards()
+            Configuration.reset()
+            UI.print_error('No connected sensors were configured')
+            UI.print_configuration_guide()
+            input()
 
 
 if __name__ == '__main__':

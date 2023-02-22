@@ -46,3 +46,26 @@ class UI:
         value = str(round(sensor.value, 3)).ljust(value_length)
 
         return f'| {name} | {value} |'
+
+    @staticmethod
+    def print_configuration_guide():
+        print('Solution:')
+
+        message = '1) Execute '
+        message += colored('configure.bat ', 'cyan')
+        message += 'in terminal to run Configure program'
+        print(message)
+
+        message = '2) Configure there your '
+        message += colored('boards ', 'cyan')
+        message += 'and '
+        message += colored('sensors', 'cyan')
+        print(message)
+
+        message = '3) Return to this window and press '
+        message += colored('enter', 'yellow')
+        print(message)
+
+    @staticmethod
+    def print_error(message):
+        print(colored(message, 'red'))
