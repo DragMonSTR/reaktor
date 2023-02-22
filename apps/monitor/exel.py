@@ -36,14 +36,13 @@ class Excel:
     def get_not_existing_sensor_names(connected_sensors, existing_sensor_names):
         not_existing_sensor_names = []
         for sensor in connected_sensors:
-            sensor_name = sensor.get_name()
             sensor_name_exists = False
             for existing_sensor_name in existing_sensor_names:
-                if existing_sensor_name == sensor_name:
+                if existing_sensor_name == sensor.name:
                     sensor_name_exists = True
                     break
             if not sensor_name_exists:
-                not_existing_sensor_names.append(sensor_name)
+                not_existing_sensor_names.append(sensor.name)
         return not_existing_sensor_names
 
     @staticmethod
@@ -58,12 +57,10 @@ class Excel:
     def generate_measurement_data_row(connected_sensors, existing_sensor_names):
         data_row = [Helper.get_current_date_string(), Helper.get_current_time_string()]
         for i, existing_sensor_name in enumerate(existing_sensor_names):
-            sensor_value = ''
             for connected_sensor in connected_sensors:
-                if connected_sensor.get_name() == existing_sensor_name:
-                    sensor_value = connected_sensor.get_value()
+                if connected_sensor.name == existing_sensor_name:
+                    data_row.append(connected_sensor.value)
                     break
-            data_row.append(sensor_value)
         return data_row
 
     @staticmethod
