@@ -3,7 +3,6 @@ const int SENSORS_PINS[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
 const char MEASURE = 'm';
 const char CONNECT_SENSOR = 'c';
-const char DISCONNECT_SENSOR = 'd';
 
 int sensorConnectedStatus[SENSORS_PINS_NUMBER];
 
@@ -16,65 +15,33 @@ void setup() {
 
 void loop() {
     if (Serial.available() > 0) {
-        String command = readCommand();
-        processCommand(command);
+        String command = Serial.readStringUntil('\n');
+
+        if (command[0] == MEASURE) {
+            measureConnectedSensors();
+        } else {
+            updateSensors(command);
+        }
     }
 }
 
 
-String readCommand() {
-    return Serial.readStringUntil('\n');
-}
-
-
-void processCommand(String command) {
-    char commandType = getCommandType(command);
-    int commandParameter = getCommandParameter(command);
-
-    if (commandType == MEASURE) {
-        measureConnectedSensors();
+void updateSensors(String connectedStatus) {
+    for (int i = 0; i < SENSORS_PINS_NUMBER; i++) {
+        if (connectedStatus[i] == CONNECT_SENSOR) {
+            sensorConnectedStatus[i] = true;
+        }
     }
-    else if (commandType == CONNECT_SENSOR) {
-        connectSensor(commandParameter);
-    }
-    else if (commandType == DISCONNECT_SENSOR) {
-        disconnectSensor(commandParameter);
-    }
-    else {
-        Serial.println("Unknown command");
-    }
-}
-
-
-char getCommandType(String command) {
-    return command[0];
-}
-
-
-int getCommandParameter(String command) {
-    return command[1] - '0';
-}
-
-
-void connectSensor(int sensorIndex) {
-    sensorConnectedStatus[sensorIndex] = true;
-}
-
-
-void disconnectSensor(int sensorIndex) {
-    sensorConnectedStatus[sensorIndex] = false;
 }
 
 
 void measureConnectedSensors() {
     String portMessage = "";
     for (int pinIndex = 0; pinIndex < SENSORS_PINS_NUMBER; pinIndex++) {
-        if (!sensorConnectedStatus[pinIndex]) {
-            continue;
+        if (sensorConnectedStatus[pinIndex]) {
+            int sensorValue = getSensorValue(pinIndex);
+            portMessage += String(sensorValue) + " ";
         }
-
-        int sensorValue = getSensorValue(pinIndex);
-        portMessage += String(sensorValue) + " ";
     }
     Serial.println(portMessage);
 }
@@ -82,6 +49,5 @@ void measureConnectedSensors() {
 
 int getSensorValue(int pinIndex) {
     int pin = SENSORS_PINS[pinIndex];
-    float value = analogRead(pin);
-    return value;
+    return analogRead(pin);
 }

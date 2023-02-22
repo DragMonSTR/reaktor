@@ -1,16 +1,11 @@
-from helper import Helper
+from configuration import Configuration
 from timing import Timing
 from board import Board
 from sync import Sync
-from UI import UIActivity
 from UI import UI
 
 
 def execute_dashboard_loop_iteration():
-    if Helper.is_last_pressed_key_esc():
-        UIActivity.open_menu_activity()
-        return
-
     Sync.update_public_data_file()
 
     need_to_update_dashboard = Timing.check_if_need_to_update_dashboard()
@@ -18,9 +13,9 @@ def execute_dashboard_loop_iteration():
 
     if need_to_update_dashboard or need_to_update_data_file:
         Board.measure_all_boards()
-        Timing.make_dashboard_updated()
+        Timing.fix_dashboard_update()
         if need_to_update_data_file:
-            Timing.make_data_file_updated()
+            Timing.fix_data_file_update()
             Sync.save_measurements_to_storage()
             try:
                 Sync.cloud_authenticate()
@@ -32,13 +27,11 @@ def execute_dashboard_loop_iteration():
 
 def main():
     Sync.cloud_authenticate()
-    Helper.start_key_listener()
+    Configuration.read_configuration_from_file()
+    Board.update_boards_list(Configuration.boards)
 
     while True:
-        if UIActivity.get_current_activity() == UIActivity.DASHBOARD_ACTIVITY:
-            execute_dashboard_loop_iteration()
-        else:
-            UI.update()
+        execute_dashboard_loop_iteration()
 
 
 if __name__ == '__main__':
