@@ -34,7 +34,7 @@ class Configuration:
                 line_index += sensors_number
 
             file.close()
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, IndexError):
             Configuration.write_configuration_to_file()
 
     @staticmethod
