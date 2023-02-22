@@ -37,4 +37,16 @@ class Configuration:
 
         file.close()
 
-Configuration.read_configuration_from_file()
+    @staticmethod
+    def set_dashboard_update_interval(interval):
+        Configuration.dashboard_update_interval = interval
+        if interval > Configuration.data_file_update_interval:
+            Configuration.data_file_update_interval = interval
+        Configuration.write_configuration_to_file()
+
+    @staticmethod
+    def set_data_file_update_interval(interval):
+        Configuration.data_file_update_interval = interval
+        if interval < Configuration.dashboard_update_interval:
+            Configuration.dashboard_update_interval = interval
+        Configuration.write_configuration_to_file()

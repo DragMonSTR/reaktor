@@ -6,6 +6,7 @@ import sys
 from board import Board
 from timing import Timing
 from activity import Activity
+from configuration import Configuration
 
 
 class UI:
@@ -95,9 +96,9 @@ class UI:
 
     @staticmethod
     def print_intervals():
-        dashboard_update_interval = f'{Timing.dashboard_update_interval}s'
+        dashboard_update_interval = f'{Configuration.dashboard_update_interval}s'
         dashboard_update_interval = colored(dashboard_update_interval, UI.YELLOW_COLOR)
-        data_file_update_interval = f'{Timing.data_file_update_interval}s'
+        data_file_update_interval = f'{Configuration.data_file_update_interval}s'
         data_file_update_interval = colored(data_file_update_interval, UI.YELLOW_COLOR)
         print(f'Dashboard updates every {dashboard_update_interval}')
         print(f'File with data updates every {data_file_update_interval}')
@@ -308,30 +309,19 @@ class UI:
         UI.print_intervals()
         UI.print_dividing_line()
 
-        question_text = 'Enter new dashboard update interval in seconds: '
-        new_interval = UI.ask_for_interval(question_text)
-        if not new_interval:
-            return
-
         min_interval = Timing.MIN_DASHBOARD_UPDATE_INTERVAL
         max_interval = Timing.MAX_DASHBOARD_UPDATE_INTERVAL
 
-        if new_interval < min_interval:
-            message = colored(
-                'Minimum dashboard update interval is ', UI.WARNING_COLOR)
-            message += colored(min_interval, UI.YELLOW_COLOR)
-            UI.set_last_message(message)
-            return
-
-        if new_interval > max_interval:
-            message = colored(
-                'Maximum dashboard update interval is ', UI.WARNING_COLOR)
-            message += colored(max_interval, UI.YELLOW_COLOR)
-            UI.set_last_message(message)
-            return
-
-        Timing.set_dashboard_update_interval(new_interval)
-        UI.set_last_message('Intervals were updated', UI.SUCCESS_COLOR)
+        try:
+            interval = int(input('Enter new dashboard update interval in seconds: '))
+            if interval < min_interval or interval > max_interval:
+                raise ValueError
+            Configuration.set_dashboard_update_interval(interval)
+            message = f'Dashboard update interval was set to {interval}'
+            UI.set_last_message(message, UI.SUCCESS_COLOR)
+        except ValueError:
+            message = f'Interval should be a number between {min_interval} and {max_interval}'
+            UI.set_last_message(message, UI.WARNING_COLOR)
 
     @staticmethod
     def change_data_file_update_interval():
@@ -340,38 +330,19 @@ class UI:
         UI.print_intervals()
         UI.print_dividing_line()
 
-        question_text = 'Enter new data file update interval in seconds: '
-        new_interval = UI.ask_for_interval(question_text)
-        if not new_interval:
-            return
-
         min_interval = Timing.MIN_DATA_FILE_UPDATE_INTERVAL
         max_interval = Timing.MAX_DATA_FILE_UPDATE_INTERVAL
 
-        if new_interval < min_interval:
-            message = colored(
-                'Minimum data file update interval is ', UI.WARNING_COLOR)
-            message += colored(min_interval, UI.YELLOW_COLOR)
-            UI.set_last_message(message)
-            return
-
-        if new_interval > max_interval:
-            message = colored(
-                'Maximum data file update interval is ', UI.WARNING_COLOR)
-            message += colored(max_interval, UI.YELLOW_COLOR)
-            UI.set_last_message(message)
-            return
-
-        Timing.set_data_file_update_interval(new_interval)
-        UI.set_last_message('Intervals were updated', UI.SUCCESS_COLOR)
-
-    @staticmethod
-    def ask_for_interval(question_test):
         try:
-            return int(input(question_test))
+            interval = int(input('Enter new data file update interval in seconds: '))
+            if interval < min_interval or interval > max_interval:
+                raise ValueError
+            Configuration.set_data_file_update_interval(interval)
+            message = f'Data file update interval was set to {interval}'
+            UI.set_last_message(message, UI.SUCCESS_COLOR)
         except ValueError:
-            UI.set_last_message('Interval should be a number', UI.WARNING_COLOR)
-            return None
+            message = f'Data file should be a number between {min_interval} and {max_interval}'
+            UI.set_last_message(message, UI.WARNING_COLOR)
 
     @staticmethod
     def print_options(options):
