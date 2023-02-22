@@ -15,7 +15,7 @@ class UI:
     YELLOW_COLOR = 'yellow'
     NAME_COLOR = 'cyan'
     MENU_OPTIONS = [
-        'Rescan boards',
+        'Update connected boards',
         'Connect a sensor',
         'Disconnect a sensor',
         'Rename a sensor',
@@ -43,8 +43,10 @@ class UI:
 
     @staticmethod
     def update_scan_boards_activity():
-        UI.scan_connected_boards()
-        if len(Board.boards_list):
+        print('Scanning connected boards...')
+        Board.update_boards_list(Configuration.boards)
+        if len(Board.boards):
+            Configuration.set_boards(Board.boards)
             Activity.current_activity = Activity.MENU
             return
 
@@ -91,8 +93,11 @@ class UI:
 
     @staticmethod
     def print_last_message():
-        if not UI.last_message == '':
-            print(UI.last_message + '\n')
+        if UI.last_message == '':
+            print('\n')
+            return
+
+        print(UI.last_message + '\n')
 
     @staticmethod
     def print_intervals():
@@ -105,58 +110,32 @@ class UI:
 
     @staticmethod
     def print_boards_configuration():
-        print('Connected boards:')
-        for board in Board.boards_list:
-            UI.print_board_info(board)
-            for pin_index, sensor in enumerate(board.sensors_list):
-                UI.print_sensor_info(sensor, pin_index)
+        print('Found boards and sensors:')
+        sensor_index = 1
+        for board in Board.boards:
+            name = colored(board.name, UI.NAME_COLOR)
+            sensors_number = board.sensors_number
+            connected_sensors_number = board.get_connected_sensors_number()
+            sensors_message = f'{connected_sensors_number}/{sensors_number}'
+            print(name, sensors_message, 'sensors connected')
+            for pin_index, sensor in enumerate(board.sensors):
+                UI.print_sensor_info(sensor_index, sensor, pin_index)
+                sensor_index += 1
 
     @staticmethod
-    def print_board_info(board):
-        board_name = colored(board.device_name, UI.NAME_COLOR)
-        connected_sensors_number = board.get_connected_sensors_number()
-        all_sensors_number = board.get_all_sensors_number()
-        print(f'{board_name} '
-              f'({connected_sensors_number}/{all_sensors_number} '
-              f'sensors connected)')
-
-    @staticmethod
-    def print_sensor_info(sensor, pin_index):
-        sensor_name = colored(sensor.get_name(), UI.NAME_COLOR)
+    def print_sensor_info(sensor_index, sensor, pin_index):
+        sensor_index = colored(str(sensor_index).rjust(2), UI.YELLOW_COLOR)
+        sensor_name = colored(sensor.name.ljust(11), UI.NAME_COLOR)
         if sensor.connected_status:
-            sensor_connection = f'connected to pin A{pin_index}'
+            sensor_connected = f'connected to pin A{pin_index}'
         else:
-            sensor_connection = f'disconnected from pin A{pin_index}'
-        print(f'  {sensor_name}: {sensor_connection}')
+            sensor_connected = f'disconnected from pin A{pin_index}'
+        print(sensor_index, sensor_name, sensor_connected)
 
     @staticmethod
     def print_menu_options():
         print('Here are available options:')
         UI.print_options(UI.MENU_OPTIONS)
-
-    @staticmethod
-    def print_dashboard():
-        sensors_list = Board.get_all_connected_sensors()
-
-        print('+------------------------------------------+-----------+')
-        print('|                sensor name               |   value   |')
-        print('+------------------------------------------+-----------+')
-        for sensor in sensors_list:
-            table_row = UI.get_dashboard_row_by_sensor(sensor)
-            print(table_row)
-        print('+------------------------------------------+-----------+')
-
-    @staticmethod
-    def get_dashboard_row_by_sensor(sensor):
-        sensor_name_formatted = sensor.get_name()
-        if len(sensor_name_formatted) > 40:
-            sensor_name_formatted = sensor_name_formatted[:37] + '...'
-        sensor_name_formatted += ' ' * (40 - len(sensor_name_formatted))
-
-        sensor_value_formatted = str(round(sensor.get_value(), 3))
-        sensor_value_formatted += ' ' * (9 - len(sensor_value_formatted))
-
-        return f'| {sensor_name_formatted} | {sensor_value_formatted} |'
 
     @staticmethod
     def ask_for_option():
@@ -167,7 +146,7 @@ class UI:
         selected_option = selected_option.lower()
 
         # reload configuration
-        if selected_option == '1' or selected_option == 'r':
+        if selected_option == '1' or selected_option == 'u':
             Activity.current_activity = Activity.SCAN_BOARDS
             UI.last_message = ''
         # connect sensor
@@ -179,6 +158,7 @@ class UI:
         # rename sensor
         elif selected_option == '4' or selected_option == 'r':
             UI.rename_sensor()
+
         # intervals settings
         elif selected_option == '5' or selected_option == 'i':
             Activity.current_activity = Activity.INTERVALS
@@ -193,91 +173,83 @@ class UI:
 
     @staticmethod
     def connect_sensor():
-        sensor_name = input('Which sensor do you want to connect:\n')
-
-        if not Board.find_sensor_by_name(sensor_name):
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name, UI.NAME_COLOR)
-            message += colored('" not found', UI.WARNING_COLOR)
+        try:
+            user_input = input('Enter the index of the sensor you want to connect: ')
+            sensor_index = int(user_input) - 1
+            if sensor_index < 0:
+                raise ValueError
+            sensor = Board.get_all_sensors()[sensor_index]
+            if sensor.connected_status:
+                raise NameError
+            sensor.connected_status = True
+            message = colored('Sensor ', UI.SUCCESS_COLOR)
+            message += colored(sensor.name, UI.NAME_COLOR)
+            message += colored(' was connected', UI.SUCCESS_COLOR)
             UI.set_last_message(message)
-            return
-
-        if Board.find_sensor_by_name(sensor_name).connected_status:
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name, UI.NAME_COLOR)
-            message += colored('" already connected', UI.WARNING_COLOR)
-            UI.set_last_message(message)
-
-        Board.connect_sensor(sensor_name)
-        message = colored('Sensor "', UI.SUCCESS_COLOR)
-        message += colored(sensor_name, UI.NAME_COLOR)
-        message += colored('" connected', UI.SUCCESS_COLOR)
-        UI.set_last_message(message)
+            Configuration.write_configuration_to_file()
+        except (ValueError, IndexError):
+            message = 'Sensor index should be a number between 1 and '
+            message += str(len(Board.get_all_sensors()))
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
+        except NameError:
+            message = 'You are trying to connect a sensor that is already connected'
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
 
     @staticmethod
     def disconnect_sensor():
-        sensor_name = input('Which sensor do you want to disconnect:\n')
-
-        if not Board.find_sensor_by_name(sensor_name):
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name, UI.NAME_COLOR)
-            message += colored('" not found', UI.WARNING_COLOR)
+        try:
+            user_input = input('Enter the index of the sensor you want to disconnect: ')
+            sensor_index = int(user_input) - 1
+            if sensor_index < 0:
+                raise ValueError
+            sensor = Board.get_all_sensors()[sensor_index]
+            if not sensor.connected_status:
+                raise NameError
+            sensor.connected_status = False
+            message = colored('Sensor ', UI.SUCCESS_COLOR)
+            message += colored(sensor.name, UI.NAME_COLOR)
+            message += colored(' was disconnected', UI.SUCCESS_COLOR)
             UI.set_last_message(message)
-            return
-
-        if not Board.find_sensor_by_name(sensor_name).connected_status:
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name, UI.NAME_COLOR)
-            message += colored('" already disconnected', UI.WARNING_COLOR)
-            UI.set_last_message(message)
-
-        Board.disconnect_sensor(sensor_name)
-        message = colored('Sensor "', UI.SUCCESS_COLOR)
-        message += colored(sensor_name, UI.NAME_COLOR)
-        message += colored('" disconnected', UI.SUCCESS_COLOR)
+            Configuration.write_configuration_to_file()
+        except (ValueError, IndexError):
+            message = 'Sensor index should be a number between 1 and '
+            message += str(len(Board.get_all_sensors()))
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
+        except NameError:
+            message = 'You are trying to disconnect a sensor that is not connected'
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
 
     @staticmethod
     def rename_sensor():
-        sensor_name_old = input('Which sensor do you want to rename:\n')
-        sensor = Board.find_sensor_by_name(sensor_name_old)
+        try:
+            user_input = input('Enter the index of the sensor you want to rename: ')
+            sensor_index = int(user_input) - 1
+            if sensor_index < 0:
+                raise ValueError
+            sensor = Board.get_all_sensors()[sensor_index]
 
-        if not sensor:
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name_old, UI.NAME_COLOR)
-            message += colored('" not found', UI.WARNING_COLOR)
+            message = 'Enter new name for sensor '
+            message += colored(sensor.name, UI.NAME_COLOR)
+            message += ': '
+            new_name = input(message)
+            old_name = sensor.name
+            if old_name == new_name:
+                raise NameError
+
+            sensor.name = new_name
+            message = colored('Sensor ', UI.SUCCESS_COLOR)
+            message += colored(old_name, UI.NAME_COLOR)
+            message += colored(' was renamed to ', UI.SUCCESS_COLOR)
+            message += colored(new_name, UI.NAME_COLOR)
             UI.set_last_message(message)
-            return
-
-        message = 'Enter new name for sensor "'
-        message += colored(sensor_name_old, UI.NAME_COLOR)
-        message += '"'
-        sensor_name_new = input(message + '\n')
-
-        if sensor_name_new == sensor_name_old:
-            message = 'New sensor name is the same as old one'
-            UI.set_last_message(message, UI.WARNING_COLOR)
-            return
-
-        if Board.find_sensor_by_name(sensor_name_new):
-            message = colored('Sensor "', UI.WARNING_COLOR)
-            message += colored(sensor_name_new, UI.NAME_COLOR)
-            message += colored('" already exists', UI.WARNING_COLOR)
-            UI.set_last_message(message)
-            return
-
-        Board.rename_sensor(sensor_name_old, sensor_name_new)
-        message = colored('Sensor "', UI.SUCCESS_COLOR)
-        message += colored(sensor_name_old, UI.NAME_COLOR)
-        message += colored('" renamed to "', UI.SUCCESS_COLOR)
-        message += colored(sensor_name_new, UI.NAME_COLOR)
-        message += colored('"', UI.SUCCESS_COLOR)
-        UI.set_last_message(message)
-
-    @staticmethod
-    def scan_connected_boards():
-        UI.clear_console()
-        print('Scanning connected boards...')
-        Board.update_boards_list()
+            Configuration.write_configuration_to_file()
+        except (ValueError, IndexError):
+            message = 'Sensor index should be a number between 1 and '
+            message += str(len(Board.get_all_sensors()))
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
+        except NameError:
+            message = 'You are trying to name a sensor with the same name'
+            UI.set_last_message(colored(message, UI.WARNING_COLOR))
 
     @staticmethod
     def print_intervals_options():
