@@ -57,10 +57,12 @@ class Excel:
     def generate_measurement_data_row(connected_sensors, existing_sensor_names):
         data_row = [Helper.get_current_date_string(), Helper.get_current_time_string()]
         for i, existing_sensor_name in enumerate(existing_sensor_names):
+            value = ''
             for connected_sensor in connected_sensors:
                 if connected_sensor.name == existing_sensor_name:
-                    data_row.append(connected_sensor.value)
+                    value = connected_sensor.value
                     break
+            data_row.append(value)
         return data_row
 
     @staticmethod
