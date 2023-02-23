@@ -7,7 +7,7 @@ from UI import UI
 
 
 def execute_dashboard_loop_iteration():
-    Sync.update_public_data_file()
+    Sync.update_public_data_files()
 
     need_to_update_dashboard = Timing.check_if_need_to_update_dashboard()
     need_to_update_data_file = Timing.check_if_need_to_update_data_file()
@@ -18,12 +18,10 @@ def execute_dashboard_loop_iteration():
         if need_to_update_data_file:
             Timing.fix_data_file_update()
             Sync.save_measurements_to_storage()
-            try:
-                Sync.cloud_authenticate()
-                Sync.upload_program_data_to_cloud()
-            except:
-                pass
         UI.update()
+
+    Sync.update_public_data_files()
+    Sync.update_drive_files()
 
 
 def main():
