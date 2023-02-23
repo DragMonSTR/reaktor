@@ -69,10 +69,10 @@ class Board:
 
     @staticmethod
     def get_all_connected_sensors():
-        sensors_list = []
+        sensors = []
         for board in Board.boards:
-            sensors_list += board.get_connected_sensors()
-        return sensors_list
+            sensors += board.get_connected_sensors()
+        return sensors
 
     @staticmethod
     def measure_all_boards():
@@ -116,11 +116,11 @@ class Board:
         return connected_sensors_number
 
     def get_connected_sensors(self):
-        connected_sensors = []
+        sensors = []
         for sensor in self.sensors:
             if sensor.connected_status:
-                connected_sensors.append(sensor)
-        return connected_sensors
+                sensors.append(sensor)
+        return sensors
 
     def measure(self):
         self.write_line(Board.MEASURE)
