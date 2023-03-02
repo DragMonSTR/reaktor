@@ -1,12 +1,10 @@
 import shutil
 import os.path
-import httplib2
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
 
@@ -64,7 +62,7 @@ class Sync:
                                        media_body=media,
                                        fields='id').execute()
             Sync.drive_file_is_up_to_date = True
-        except (HttpError, httplib2.error.ServerNotFoundError, TimeoutError):
+        except:
             pass
 
     @staticmethod
